@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Akshay Kumar - Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #0f0f1a;
+            --text-color: #e0e0e0;
+            --highlight-color: #00f2ea;
+            --navbar-bg: rgba(15, 15, 26, 0.8);
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+        }
+        .navbar {
+            background-color: var(--navbar-bg);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-brand {
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--highlight-color);
+        }
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        .navbar-menu a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .navbar-menu a:hover {
+            color: var(--highlight-color);
+        }
+        .hamburger {
+            display: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        #menu-toggle { display: none; }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-direction: column;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .hero p {
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            font-family: 'Roboto Mono', monospace;
+        }
+        .highlight { color: var(--highlight-color); }
+        .split-text { opacity: 0; }
+
+        .work-section, .about-section, .journey-section {
+            padding: 100px 0;
+        }
+        .work-header-container { text-align: center; margin-bottom: 4rem; }
+        .work-main-header { font-size: 3rem; font-weight: 700; color: var(--highlight-color); }
+        .work-sub-header { font-size: 1.2rem; color: #aaa; }
+
+        .code-wrapper {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 1.5rem;
+            max-width: 800px;
+            margin: auto;
+            display: flex;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .line-numbers {
+            padding-right: 1.5rem;
+            text-align: right;
+            color: #888;
+            user-select: none;
+        }
+        .code-content { white-space: pre-wrap; }
+        .keyword { color: #c586c0; }
+        .module { color: #4ec9b0; }
+        .function { color: #dcdcaa; }
+        .class-name { color: #4ec9b0; }
+        .string { color: #ce9178; }
+        .decorator { color: #dcdcaa; }
+        .variable { color: #9cdcfe; }
+
+        .timeline-container-custom {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        .timeline-line-upgraded {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--highlight-color), transparent);
+            transform: translateX(-50%);
+        }
+        .timeline-event {
+            position: relative;
+            width: 50%;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+        }
+        .timeline-event.left { left: 0; }
+        .timeline-event.right { left: 50%; }
+        .timeline-event .card {
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            color: white;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .timeline-event .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+        }
+        .content-box, .date-box { position: relative; z-index: 1; }
+        .card-title { font-size: 1.5rem; font-weight: bold; }
+        .card-content { font-size: 1rem; }
+        .date-box { align-self: flex-end; text-align: center; }
+        .month { display: block; font-size: 1rem; }
+        .date { display: block; font-size: 1.5rem; font-weight: bold; }
+
+        .footer {
+            background-color: #1a1a2e;
+            padding: 4rem 2rem;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        .footer-contact-form input, .footer-contact-form textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.8rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        .footer-contact-form button {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--highlight-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .footer-social-link svg {
+            width: 30px; height: 30px;
+            fill: white;
+            transition: fill 0.3s;
+        }
+        .footer-social-link:hover svg { fill: var(--highlight-color); }
+        .footer-bottom {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @keyframes spin-slow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 6s linear infinite;
+            border-color: #00f2ea #00f2ea #0f0f1a #0f0f1a;
+            border-width: 4px;
+            border-style: solid;
+            pointer-events: none;
+        }
+        .profile-img {
+            transition: transform 0.5s cubic-bezier(.68,-0.55,.27,1.55), box-shadow 0.5s;
+            z-index: 1;
+            position: relative;
+        }
+        .profile-img:hover {
+            transform: scale(1.08) rotate(-3deg);
+            box-shadow: 0 0 60px 0 #00f2ea99;
+        }
+        /* Portfolio card hover animation */
+        a.bg-white\/10:hover {
+            transform: translateY(-8px) scale(1.03) rotate(-1deg);
+            box-shadow: 0 8px 32px 0 #00f2ea44;
+            transition: all 0.3s cubic-bezier(.68,-0.55,.27,1.55);
+            z-index: 2;
+        }
+        /* Timeline event animation */
+        .timeline-event {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s, transform 0.7s;
+        }
+        .timeline-event.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .journey-anim {
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+            transition: opacity 0.7s, transform 0.7s;
+        }
+        .timeline-event.visible .journey-anim {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        /* Journey dot pulse animation */
+        .journey-dot {
+            animation: journey-dot-pulse 1.5s infinite alternate;
+        }
+        @keyframes journey-dot-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0,242,234,0.7); }
+            100% { box-shadow: 0 0 0 12px rgba(0,242,234,0); }
+        }
+        /* Fade-in left/right for journey events */
+        .journey-fade {
+            opacity: 0;
+            transform: translateX(-40px) scale(0.97);
+            transition: opacity 0.7s, transform 0.7s;
+        }
+        .timeline-event.visible.journey-fade {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+
+        @media (max-width: 768px) {
+            .navbar-menu {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--navbar-bg);
+            }
+            .navbar-menu li { padding: 1rem; text-align: center; }
+            .hamburger { display: block; }
+            #menu-toggle:checked ~ .navbar-menu { display: flex; }
+            .timeline-line-upgraded { left: 20px; }
+            .timeline-event { width: 100%; padding-left: 50px; }
+            .timeline-event.right { left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">AKSHAY</div>
+        <input type="checkbox" id="menu-toggle">
+        <label for="menu-toggle" class="hamburger">&#9776;</label>
+        <ul class="navbar-menu">
+            <li><a href="#start">Start</a></li>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#journey">Journey</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <header id="start" class="hero">
+        <div class="content flex flex-col items-center justify-center">
+            <!-- Profile Image in Circle with Animation -->
+            <div class="relative mb-6">
+                <img 
+                    src="/Pictures/myPicture.jpg" 
+                    alt="Akshay Kumar" 
+                    class="w-60 h-60 rounded-full border-4 border-cyan-400 shadow-lg object-cover profile-img"
+                    style="box-shadow: 0 0 40px 0 #00f2ea55;"
+                />
+                <!-- Animated ring -->
+                <span class="absolute inset-0 rounded-full border-4 border-cyan-400 animate-spin-slow pointer-events-none"></span>
+            </div>
+            <h1 class="split-text">Hi, I'm <span class="highlight">Akshay Kumar</span></h1>
+            <p>An Enthusiast who <span class="decrypted-cycle"
+                data-words='["develops websites", "analyzes data", "builds applications"]'
+                data-speed="70"
+                data-characters="ABCDEFGHIJKLMNOPQRSTUVWXYZ">
+                develops websites
+            </span></p>
+        </div>
+    </header>
+
+    <!-- Resume Link Above Work Section -->
+    <div class="flex justify-center mt-16">
+        {% comment %} <a href="https://drive.google.com/your_resume_link" target="_blank" class="inline-block px-8 py-3 bg-cyan-400 text-black font-bold rounded-full shadow-lg hover:bg-cyan-300 transition text-lg">
+            View My Resume
+        </a> {% endcomment %}
+    </div>
+    <section id="work" class="work-section">
+        <div class="work-header-container">
+            <h1 class="work-main-header">WORK</h1>
+            <h3 class="work-sub-header">Projects I Have Worked On</h3>
+        </div>
+        <div class="mb-10 md:mb-0 md:pl-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto justify-center">
+        
+            <!-- Responsive Portfolio Website -->
+            {% comment %} <a href="https://portfolio-zgzp.onrender.com" class="bg-white/10 backdrop-blur-md p-4 rounded-lg shadow-lg block hover:bg-white/20 transition">
+                <img src="https://placehold.co/600x400/0f0f1a/00f2ea?text=Portfolio+Site" alt="Portfolio Website" class="w-full h-48 object-cover rounded-md mb-4">
+                <h3 class="text-xl font-semibold mb-2">Responsive Portfolio Website</h3>
+                <p class="text-sm text-gray-300">
+                    A personal portfolio built with HTML, CSS, and Bootstrap. Showcases my skills, journey, and projects in a modern, responsive design.
+                </p>
+            </a> {% endcomment %}
+
+             <!-- Web Development Projects -->
+            <a href="#" class="bg-white/10 backdrop-blur-md p-4 rounded-lg shadow-lg block hover:bg-white/20 transition">
+                <img src="https://placehold.co/600x400/0f0f1a/00f2ea?text=Web+Dev+Projects" alt="Web Development Projects" class="w-full h-48 object-cover rounded-md mb-4">
+                <h3 class="text-xl font-semibold mb-2">Web Development Projects</h3>
+                <p class="text-sm text-gray-300">
+                    Built and deployed multiple responsive websites using HTML, CSS, Bootstrap, and JavaScript. Focused on clean UI, accessibility, and performance.
+                </p>
+            </a>
+
+            <!-- AI Mock Interview Platform (In Progress) -->
+            <a href="#" class="bg-white/10 backdrop-blur-md p-4 rounded-lg shadow-lg block hover:bg-white/20 transition opacity-80 cursor-not-allowed">
+                <img src="https://placehold.co/600x400/0f0f1a/00f2ea?text=AI+Mock+Interview" alt="AI Mock Interview Platform" class="w-full h-48 object-cover rounded-md mb-4">
+                <h3 class="text-xl font-semibold mb-2">AI Mock Interview Platform <span class="text-xs text-cyan-300">(In Progress)</span></h3>
+                <p class="text-sm text-gray-300">
+                    Currently developing a platform that uses AI to simulate mock interviews and provide feedback to users, helping them prepare for real-world interviews.
+                </p>
+            </a>
+        </div>
+        <!-- Many more coming message -->
+        <div class="flex justify-center mt-10">
+            <div class="bg-cyan-400/20 text-cyan-300 px-8 py-4 rounded-full text-lg font-semibold shadow-lg animate-pulse">
+                ...Many More Coming 🚀
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about-section">
+        <div class="about-container">
+            <div class="work-header-container">
+                <h2 class="work-main-header">About Me</h2>
+                <h3 class="work-sub-header">Know Me Better</h3>
+            </div>
+            <div class="bg-white/5 rounded-lg p-8 max-w-3xl mx-auto shadow-lg">
+                <h3 class="text-2xl font-bold mb-4 text-cyan-400">Who am I?</h3>
+                <p class="mb-6 text-lg">
+                    Hi, I'm <span class="highlight font-semibold">Akshay Kumar</span> from Shimla, Himachal Pradesh, India. I'm a passionate Computer Science student at HPTU, always eager to learn and build new things. I love solving problems, exploring new technologies, and collaborating on innovative projects.
+                </p>
+                <h4 class="text-xl font-semibold mb-2 text-cyan-300">Skills</h4>
+                <ul class="list-disc list-inside mb-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                    <li>Core Java</li>
+                    <li>Python</li>
+                    <li>HTML5 &amp; CSS3</li>
+                    <li>Bootstrap</li>
+                    <li>Jupyter</li>
+                    <li>Web Development</li>
+                    <li>Problem Solving</li>
+                    <li>Data Analysis</li>
+                </ul>
+                <h4 class="text-xl font-semibold mb-2 text-cyan-300">Projects</h4>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>
+                        <span class="font-semibold">Web Development Projects:</span>
+                        Built and deployed responsive websites using HTML, CSS, Bootstrap, and JavaScript.
+                    </li>
+                    <li>
+                        <span class="font-semibold">AI Mock Interview Platform (In Progress):</span>
+                        Currently developing a platform that uses AI to simulate mock interviews and provide feedback to users.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="journey" class="journey-section">
+        <div class="work-header-container">
+            <h1 class="work-main-header">My Journey</h1>
+            <h3 class="work-sub-header">A Timeline of My Progress</h3>
+        </div>
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Timeline Column -->
+                <div class="md:col-span-3">
+                    <ol class="relative border-l-4 border-cyan-400">
+                        <li class="mb-10 ml-6 timeline-event journey-fade">
+                            <span class="absolute flex items-center justify-center w-8 h-8 bg-cyan-400 rounded-full -left-4 ring-8 ring-white journey-dot"></span>
+                            <div class="bg-white/10 p-6 rounded-lg shadow-lg journey-anim">
+                                <h3 class="font-bold text-lg text-cyan-300">Started B.Tech</h3>
+                                <time class="block mb-2 text-sm font-normal leading-none text-gray-400">AUG 2022</time>
+                                <p class="mb-2 text-base font-normal text-gray-200">Began my Computer Science journey at HPTU.</p>
+                            </div>
+                        </li>
+                        <li class="mb-10 ml-6 timeline-event journey-fade">
+                            <span class="absolute flex items-center justify-center w-8 h-8 bg-cyan-400 rounded-full -left-4 ring-8 ring-white journey-dot"></span>
+                            <div class="bg-white/10 p-6 rounded-lg shadow-lg journey-anim">
+                                <h3 class="font-bold text-lg text-cyan-300">Hackathon Team Player</h3>
+                                <time class="block mb-2 text-sm font-normal leading-none text-gray-400">DEC 2023</time>
+                                <p class="mb-2 text-base font-normal text-gray-200">Participated in a college hackathon as a team player, collaborating and building solutions under time constraints.</p>
+                            </div>
+                        </li>
+                        <li class="mb-10 ml-6 timeline-event journey-fade">
+                            <span class="absolute flex items-center justify-center w-8 h-8 bg-cyan-400 rounded-full -left-4 ring-8 ring-white journey-dot"></span>
+                            <div class="bg-white/10 p-6 rounded-lg shadow-lg journey-anim">
+                                <h3 class="font-bold text-lg text-cyan-300">Placement Representative</h3>
+                                <time class="block mb-2 text-sm font-normal leading-none text-gray-400">JAN 2024</time>
+                                <p class="mb-2 text-base font-normal text-gray-200">Took on a leadership role at ABVGIET PRAGATINAGAR.</p>
+                            </div>
+                        </li>
+                        <li class="mb-10 ml-6 timeline-event journey-fade">
+                            <span class="absolute flex items-center justify-center w-8 h-8 bg-cyan-400 rounded-full -left-4 ring-8 ring-white journey-dot"></span>
+                            <div class="bg-white/10 p-6 rounded-lg shadow-lg journey-anim">
+                                <h3 class="font-bold text-lg text-cyan-300">Web Dev Trainee</h3>
+                                <time class="block mb-2 text-sm font-normal leading-none text-gray-400">JUN 2024</time>
+                                <p class="mb-2 text-base font-normal text-gray-200">Gained hands-on experience at Netcoder Technology.</p>
+                            </div>
+                        </li>
+                        <li class="mb-10 ml-6 timeline-event journey-fade">
+                            <span class="absolute flex items-center justify-center w-8 h-8 bg-cyan-400 rounded-full -left-4 ring-8 ring-white journey-dot"></span>
+                            <div class="bg-white/10 p-6 rounded-lg shadow-lg journey-anim">
+                                <h3 class="font-bold text-lg text-cyan-300">Smart India Hackathon</h3>
+                                <time class="block mb-2 text-sm font-normal leading-none text-gray-400">OCT 2024</time>
+                                <p class="mb-2 text-base font-normal text-gray-200">Represented my college in the Smart India Hackathon, working on innovative solutions with a talented team.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+                <!-- Images Column (now on the right) -->
+                <div class="flex flex-col gap-10 items-center md:items-start md:col-span-1">
+                    <img src="/Pictures/picture1.jpg" alt="" class="w-90 h-50 object-cover rounded-xl shadow-md">
+                    <img src="/Pictures/picture2.jpg" alt="" class="w-90 h-50 object-cover rounded-xl shadow-md">
+                    {% comment %} <img src="https://placehold.co/400x300/00f2ea/0f0f1a?text=picture3" alt="Placement Representative" class="w-90 h-50 object-cover rounded-xl shadow-md">
+                    <img src="https://placehold.co/400x300/00f2ea/0f0f1a?text=picture4" alt="Web Dev Trainee" class="w-90 h-50 object-cover rounded-xl shadow-md">
+                    <img src="https://placehold.co/400x300/00f2ea/0f0f1a?text=picture5" alt="Smart India Hackathon" class="w-90 h-50 object-cover rounded-xl shadow-md"> {% endcomment %}
+                </div> 
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact" class="footer">
+        <div class="footer-container max-w-6xl mx-auto">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h2 class="text-3xl font-bold mb-4" style="font-family: 'Roboto Mono', monospace;">Contact Me</h2>
+                    <p class="text-gray-400">Have a question or want to work together? Feel free to reach out.</p>
+                    <ul class="footer-social mt-4">
+                        <li><a href="https://github.com/kumarakshay30" target="_blank" class="footer-social-link github">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><path d="M15,3C8.373,3,3,8.373,3,15c0,5.623,3.872,10.328,9.092,11.63C12.036,26.468,12,26.28,12,26.047v-2.051 c-0.487,0-1.303,0-1.508,0c-0.821,0-1.551-0.353-1.905-1.009c-0.393-0.729-0.461-1.844-1.435-2.526 c-0.289-0.227-0.069-0.486,0.264-0.451c0.615,0.174,1.125,0.596,1.605,1.222c0.478,0.627,0.703,0.769,1.596,0.769 c0.433,0,1.081-0.025,1.691-0.121c0.328-0.833,0.895-1.6,1.588-1.962c-3.996-0.411-5.903-2.399-5.903-5.098 c0-1.162,0.495-2.286,1.336-3.233C9.053,10.647,8.706,8.73,9.435,8c1.798,0,2.885,1.166,3.146,1.481C13.477,9.174,14.461,9,15.495,9 c1.036,0,2.024,0.174,2.922,0.483C18.675,9.17,19.763,8,21.565,8c0.732,0.731,0.381,2.656,0.102,3.594 c0.836,0.945,1.328,2.066,1.328,3.226c0,2.697-1.904,4.684-5.894,5.097C18.199,20.49,19,22.1,19,23.313v2.734 c0,0.104-0.023,0.179-0.035,0.268C23.641,24.676,27,20.236,27,15C27,8.373,21.627,3,15,3z"/></svg>
+                        </a></li>
+                        <li><a href="https://www.linkedin.com/in/akshay-kumar-2481aa2b6" target="_blank" class="footer-social-link dribbble">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M 9 4 C 6.2504839 4 4 6.2504839 4 9 L 4 41 C 4 43.749516 6.2504839 46 9 46 L 41 46 C 43.749516 46 46 43.749516 46 41 L 46 9 C 46 6.2504839 43.749516 4 41 4 L 9 4 z M 9 6 L 41 6 C 42.668484 6 44 7.3315161 44 9 L 44 41 C 44 42.668484 42.668484 44 41 44 L 9 44 C 7.3315161 44 6 42.668484 6 41 L 6 9 C 6 7.3315161 7.3315161 6 9 6 z M 14 11.011719 C 12.904779 11.011719 11.919219 11.339079 11.189453 11.953125 C 10.459687 12.567171 10.011719 13.484511 10.011719 14.466797 C 10.011719 16.333977 11.631285 17.789609 13.691406 17.933594 A 0.98809878 0.98809878 0 0 0 13.695312 17.935547 A 0.98809878 0.98809878 0 0 0 14 17.988281 C 16.27301 17.988281 17.988281 16.396083 17.988281 14.466797 A 0.98809878 0.98809878 0 0 0 17.986328 14.414062 C 17.884577 12.513831 16.190443 11.011719 14 11.011719 z M 14 12.988281 C 15.392231 12.988281 15.94197 13.610038 16.001953 14.492188 C 15.989803 15.348434 15.460091 16.011719 14 16.011719 C 12.614594 16.011719 11.988281 15.302225 11.988281 14.466797 C 11.988281 14.049083 12.140703 13.734298 12.460938 13.464844 C 12.78117 13.19539 13.295221 12.988281 14 12.988281 z M 11 19 A 1.0001 1.0001 0 0 0 10 20 L 10 39 A 1.0001 1.0001 0 0 0 11 40 L 17 40 A 1.0001 1.0001 0 0 0 18 39 L 18 33.134766 L 18 20 A 1.0001 1.0001 0 0 0 17 19 L 11 19 z M 20 19 A 1.0001 1.0001 0 0 0 19 20 L 19 39 A 1.0001 1.0001 0 0 0 20 40 L 26 40 A 1.0001 1.0001 0 0 0 27 39 L 27 29 C 27 28.170333 27.226394 27.345035 27.625 26.804688 C 28.023606 26.264339 28.526466 25.940057 29.482422 25.957031 C 30.468166 25.973981 30.989999 26.311669 31.384766 26.841797 C 31.779532 27.371924 32 28.166667 32 29 L 32 39 A 1.0001 1.0001 0 0 0 33 40 L 39 40 A 1.0001 1.0001 0 0 0 40 39 L 40 28.261719 C 40 25.300181 39.122788 22.95433 37.619141 21.367188 C 36.115493 19.780044 34.024172 19 31.8125 19 C 29.710483 19 28.110853 19.704889 27 20.423828 L 27 20 A 1.0001 1.0001 0 0 0 26 19 L 20 19 z M 12 21 L 16 21 L 16 33.134766 L 16 38 L 12 38 L 12 21 z M 21 21 L 25 21 L 25 22.560547 A 1.0001 1.0001 0 0 0 26.798828 23.162109 C 26.798828 23.162109 28.369194 21 31.8125 21 C 33.565828 21 35.069366 21.582581 36.167969 22.742188 C 37.266572 23.901794 38 25.688257 38 28.261719 L 38 38 L 34 38 L 34 29 C 34 27.833333 33.720468 26.627107 32.990234 25.646484 C 32.260001 24.665862 31.031834 23.983076 29.517578 23.957031 C 27.995534 23.930001 26.747519 24.626988 26.015625 25.619141 C 25.283731 26.611293 25 27.829667 25 29 L 25 38 L 21 38 L 21 21 z"/></svg>
+                        </a></li>
+                        <li><a href="https://www.instagram.com/i_am_akshay_kr_" target="_blank" class="footer-social-link instagram">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="30" height="30">
+                            <circle cx="16" cy="16" r="14" fill="#fff" opacity="0.1"/>
+                            <path d="M16 9.6A6.4 6.4 0 1 0 22.4 16 6.41 6.41 0 0 0 16 9.6zm0 10.56A4.16 4.16 0 1 1 20.16 16 4.16 4.16 0 0 1 16 20.16zm6.72-10.88a1.5 1.5 0 1 1-1.5-1.5A1.5 1.5 0 0 1 22.72 9.28zm4.32 1.52a6.13 6.13 0 0 0-1.68-4.32A6.13 6.13 0 0 0 21.28 4.8C19.36 4.16 12.64 4.16 10.72 4.8A6.13 6.13 0 0 0 6.96 6.96 6.13 6.13 0 0 0 4.8 10.72C4.16 12.64 4.16 19.36 4.8 21.28a6.13 6.13 0 0 0 2.16 3.76 6.13 6.13 0 0 0 3.76 2.16c1.92.64 8.64.64 10.56 0a6.13 6.13 0 0 0 3.76-2.16 6.13 6.13 0 0 0 2.16-3.76c.64-1.92.64-8.64 0-10.56zM28 21.12a4.36 4.36 0 0 1-1.12 2.56 4.36 4.36 0 0 1-2.56 1.12c-1.76.68-7.04.68-8.8 0a4.36 4.36 0 0 1-2.56-1.12 4.36 4.36 0 0 1-1.12-2.56c-.68-1.76-.68-7.04 0-8.8a4.36 4.36 0 0 1 1.12-2.56 4.36 4.36 0 0 1 2.56-1.12c1.76-.68 7.04-.68 8.8 0a4.36 4.36 0 0 1 2.56 1.12 4.36 4.36 0 0 1 1.12 2.56c.68 1.76.68 7.04 0 8.8z" fill="#fff"/>
+                        </svg>
+                        </a></li>
+                    </ul>                    
+                </div>
+                <!-- Personal Info Section (left side of Send Message) -->
+                <div class="footer-personal-info bg-white/5 rounded-lg p-6 mb-6 md:mb-0 shadow-lg">
+                    <h2 class="text-xl font-bold mb-4 text-cyan-400">Personal Information</h2>
+                    <ul class="text-base space-y-2">
+                        <li><span class="font-semibold text-cyan-300">Name:</span> Akshay Kumar</li>
+                        <li><span class="font-semibold text-cyan-300">Location:</span> Shimla, Himachal Pradesh, India</li>
+                        <li>
+                            <span class="font-semibold text-cyan-300">Email:</span>
+                            <a href="mailto:contact.kumarakshay01@gmail.com" class="text-cyan-300 hover:underline">
+                                contact.kumarakshay01@gmail.com
+                            </a>
+                        </li>
+                        <li><span class="font-semibold text-cyan-300">Phone:</span> +91 8219971653</li>
+                        <li><span class="font-semibold text-cyan-300">Languages:</span> English, Hindi</li>
+                        <li><span class="font-semibold text-cyan-300">Hobbies:</span> Coding, Reading, Traveling</li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h2 class="text-xl font-bold mb-4 text-cyan-400">Send Message</h2>
+                    <!-- Replace 'your_form_id' with your Formspree form ID after signing up at https://formspree.io/ -->
+                    <form class="footer-contact-form" id="contactForm" action="https://formspree.io/f/xdkdqrok" method="POST">
+                        <input type="text" name="name" placeholder="Your Name" required>
+                        <input type="email" name="email" placeholder="Your Email" required>
+                        <textarea name="message" placeholder="Your Message" rows="4" required></textarea>
+                        <button type="submit">Send Message</button>
+                        <div id="formSuccess" style="display:none;color:#00f2ea;margin-top:1rem;font-weight:bold;">Thank you! Your message has been sent.</div>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-bottom-flex flex flex-col md:flex-row justify-between items-center">
+                    <p>
+                        <span>All rights reserved.</span>
+                        <a href="#">Terms &amp; Conditions</a>
+                    </p>
+                    <p>&copy; 2025 Akshay Kumar</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // GSAP animation for hero text
+            gsap.to(".split-text", {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                stagger: 0.1,
+                ease: "power2.out"
+            });
+
+            // Decrypting text effect
+            class Decrypt {
+                constructor(el) {
+                    this.el = el;
+                    this.words = JSON.parse(this.el.dataset.words);
+                    this.speed = this.el.dataset.speed || 50;
+                    this.characters = this.el.dataset.characters || "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    this.currentWordIndex = 0;
+                    this.cycle();
+                }
+
+                cycle() {
+                    this.el.innerText = "";
+                    const word = this.words[this.currentWordIndex];
+                    let i = 0;
+                    const interval = setInterval(() => {
+                        this.el.innerText = word.substring(0, i + 1) + this.randomChars(word.length - i - 1);
+                        i++;
+                        if (i >= word.length) {
+                            clearInterval(interval);
+                            setTimeout(() => this.cycle(), 2000);
+                        }
+                    }, this.speed);
+                    this.currentWordIndex = (this.currentWordIndex + 1) % this.words.length;
+                }
+
+                randomChars(length) {
+                    let result = "";
+                    for (let i = 0; i < length; i++) {
+                        result += this.characters.charAt(Math.floor(Math.random() * this.characters.length));
+                    }
+                    return result;
+                }
+            }
+            document.querySelectorAll('.decrypted-cycle').forEach(el => new Decrypt(el));
+
+            // Line numbers for code block
+            const codeBlock = document.querySelector('.code-content code');
+            if (codeBlock) {
+                const lineCount = codeBlock.innerHTML.split('\n').length;
+                const lineNumbersEl = document.getElementById('lineNumbers');
+                for (let i = 1; i <= lineCount; i++) {
+                    lineNumbersEl.innerHTML += `${i}<br>`;
+                }
+            }
+
+            // Timeline scroll animation
+            const timelineEvents = document.querySelectorAll('.timeline-event');
+            function revealTimeline() {
+                const triggerBottom = window.innerHeight * 0.95;
+                let delay = 0;
+                timelineEvents.forEach((event, idx) => {
+                    const boxTop = event.getBoundingClientRect().top;
+                    if (boxTop < triggerBottom) {
+                        setTimeout(() => {
+                            event.classList.add('visible');
+                        }, delay);
+                        delay += 150; // stagger animation
+                    }
+                });
+            }
+            window.addEventListener('scroll', revealTimeline);
+            revealTimeline();
+            // Formspree AJAX success message
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(contactForm);
+                    fetch(contactForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'Accept': 'application/json' }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            document.getElementById('formSuccess').style.display = 'block';
+                            contactForm.reset();
+                        } else {
+                            response.json().then(data => {
+                                alert(data.error || 'Oops! There was a problem sending your message.');
+                            });
+                        }
+                    })
+                    .catch(() => {
+                        alert('Oops! There was a problem sending your message.');
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
